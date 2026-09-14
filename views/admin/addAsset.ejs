@@ -1,0 +1,101 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Add New Equipment Asset</h1>
+    <p class="page-subtitle">Register new lab equipment into the central inventory system</p>
+  </div>
+  <a href="/admin/assets" class="btn btn-secondary">&larr; Back to Assets</a>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+  <div class="card-body">
+    <form action="/admin/assets/add" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="assetTag">Asset Tag / Identifier *</label>
+          <input 
+            type="text" 
+            id="assetTag" 
+            name="assetTag" 
+            class="form-control" 
+            placeholder="e.g. LAP001, OSC002" 
+            required 
+            autofocus
+          />
+          <p class="form-help">Must be a unique institutional serial code</p>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Equipment / Asset Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            placeholder="e.g. Dell Latitude Laptop, Digital Storage Oscilloscope" 
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <input 
+            type="text" 
+            id="category" 
+            name="category" 
+            class="form-control" 
+            placeholder="e.g. Computer, Electronics, Optics, Mechanical" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="location">Lab / Department Location *</label>
+          <input 
+            type="text" 
+            id="location" 
+            name="location" 
+            class="form-control" 
+            placeholder="e.g. Computer Lab 1, Microprocessor Lab" 
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="condition">Initial Physical Condition *</label>
+          <select id="condition" name="condition" class="form-control" required>
+            <option value="OK" selected>OK (Functional & Ready)</option>
+            <option value="Damaged">Damaged (Needs Repair)</option>
+            <option value="Lost">Lost</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Initial Total Quantity *</label>
+          <input 
+            type="number" 
+            id="quantity" 
+            name="quantity" 
+            class="form-control" 
+            min="1" 
+            value="1" 
+            required 
+          />
+          <p class="form-help">Initial available units will be set equal to this quantity</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; display: flex; gap: 12px;">
+        <button type="submit" class="btn btn-primary">Save Asset to Inventory</button>
+        <a href="/admin/assets" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

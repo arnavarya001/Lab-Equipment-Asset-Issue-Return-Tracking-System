@@ -1,0 +1,113 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Manage Equipment Requests Queue</h1>
+    <p class="page-subtitle">Review incoming requests, issue approved equipment, and maintain audit logs</p>
+  </div>
+  <div class="btn-group">
+    <a href="/lab-incharge/requests" class="btn <%= currentFilter === 'All' ? 'btn-primary' : 'btn-secondary' %> btn-sm">All</a>
+    <a href="/lab-incharge/requests?status=Pending" class="btn <%= currentFilter === 'Pending' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Pending</a>
+    <a href="/lab-incharge/requests?status=Approved" class="btn <%= currentFilter === 'Approved' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Approved</a>
+    <a href="/lab-incharge/requests?status=Issued" class="btn <%= currentFilter === 'Issued' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Issued</a>
+    <a href="/lab-incharge/requests?status=Returned" class="btn <%= currentFilter === 'Returned' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Returned</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Requester</th>
+          <th>Asset Details</th>
+          <th>Stock on Shelf</th>
+          <th>Qty Req.</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (requests && requests.length > 0) { %>
+          <% requests.forEach(r => { %>
+            <tr class="<%= r.isOverdue ? 'row-overdue' : '' %>">
+              <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+              <td>
+                <strong><%= r.requester ? r.requester.name : 'Unknown' %></strong>
+                <div class="form-help"><%= r.requester ? r.requester.email : '' %></div>
+              </td>
+              <td>
+                <strong><%= r.asset ? r.asset.name : 'Unknown Asset' %></strong>
+                <div class="form-help">Tag: <code><%= r.asset ? r.asset.assetTag : 'N/A' %></code></div>
+              </td>
+              <td>
+                <% if (r.asset) { %>
+                  <strong style="color: <%= r.asset.availableQuantity >= r.quantity ? 'var(--success)' : 'var(--danger)' %>;">
+                    <%= r.asset.availableQuantity %> / <%= r.asset.quantity %>
+                  </strong>
+                <% } else { %>
+                  &mdash;
+                <% } %>
+              </td>
+              <td><strong><%= r.quantity %></strong></td>
+              <td>
+                <%= new Date(r.expectedReturnDate).toLocaleDateString() %>
+                <% if (r.isOverdue) { %>
+                  <span class="badge badge-overdue" style="display:block; width:fit-content; margin-top:4px;">OVERDUE</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge badge-<%= r.status.toLowerCase() %>"><%= r.status %></span>
+              </td>
+              <td>
+                <% if (r.status === 'Pending') { %>
+                  <div class="btn-group">
+                    <form action="/lab-incharge/request/<%= r._id %>/approve" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-success btn-sm">&#10003; Approve</button>
+                    </form>
+                    <form action="/lab-incharge/request/<%= r._id %>/reject" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-sm">&#10007; Reject</button>
+                    </form>
+                  </div>
+                <% } else if (r.status === 'Approved') { %>
+                  <form action="/lab-incharge/request/<%= r._id %>/issue" method="POST">
+                    <button 
+                      type="submit" 
+                      class="btn btn-primary btn-sm"
+                      <%= (r.asset && r.asset.availableQuantity < r.quantity) ? 'disabled title="Stock unavailable"' : '' %>
+                    >
+                      &#128230; Handover & Issue
+                    </button>
+                  </form>
+                  <% if (r.asset && r.asset.availableQuantity < r.quantity) { %>
+                    <div class="form-help" style="color: var(--danger); font-size: 0.75rem;">
+                      Insufficient stock!
+                    </div>
+                  <% } %>
+                <% } else if (r.status === 'Issued') { %>
+                  <a href="/lab-incharge/returns" class="btn btn-secondary btn-sm">&rarr; Go to Returns</a>
+                <% } else if (r.status === 'Returned') { %>
+                  <span class="badge badge-condition-<%= r.returnCondition ? r.returnCondition.toLowerCase() : 'ok' %>">
+                    Condition: <%= r.returnCondition || 'OK' %>
+                  </span>
+                <% } else { %>
+                  <span style="color: var(--text-muted);">&mdash;</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              No equipment requests found for filter "<%= currentFilter %>".
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

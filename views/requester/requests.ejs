@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">My Equipment Requests</h1>
+    <p class="page-subtitle">Track status transitions from Pending to Return for all your requests</p>
+  </div>
+  <a href="/requester/equipment" class="btn btn-primary">+ Request New Equipment</a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Request Date</th>
+          <th>Asset</th>
+          <th>Tag</th>
+          <th>Qty</th>
+          <th>Purpose</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th>Issued Date</th>
+          <th>Return Condition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (requests && requests.length > 0) { %>
+          <% requests.forEach(r => { %>
+            <tr class="<%= r.isOverdue ? 'row-overdue' : '' %>">
+              <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+              <td><strong><%= r.asset ? r.asset.name : 'Unknown Asset' %></strong></td>
+              <td><code><%= r.asset ? r.asset.assetTag : 'N/A' %></code></td>
+              <td><strong><%= r.quantity %></strong></td>
+              <td><%= r.purpose %></td>
+              <td>
+                <%= new Date(r.expectedReturnDate).toLocaleDateString() %>
+                <% if (r.isOverdue) { %>
+                  <span class="badge badge-overdue" style="display:block; margin-top: 4px; width: fit-content;">OVERDUE</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge badge-<%= r.status.toLowerCase() %>"><%= r.status %></span>
+                <% if (r.status === 'Rejected' && r.remarks) { %>
+                  <div class="form-help" style="color: var(--danger);"><%= r.remarks %></div>
+                <% } %>
+              </td>
+              <td>
+                <%= r.issuedAt ? new Date(r.issuedAt).toLocaleDateString() : '&mdash;' %>
+              </td>
+              <td>
+                <% if (r.returnCondition) { %>
+                  <span class="badge badge-condition-<%= r.returnCondition.toLowerCase() %>"><%= r.returnCondition %></span>
+                <% } else { %>
+                  <span style="color: var(--text-muted);">&mdash;</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              No requests placed yet. <a href="/requester/equipment">Click here to browse available lab equipment</a>.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

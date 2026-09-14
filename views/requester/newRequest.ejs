@@ -1,0 +1,71 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Request Equipment: <%= asset.name %></h1>
+    <p class="page-subtitle">Asset Tag: <code><%= asset.assetTag %></code> | Location: <%= asset.location %></p>
+  </div>
+  <a href="/requester/equipment" class="btn btn-secondary">&larr; Back to Catalog</a>
+</div>
+
+<div class="card" style="max-width: 650px; margin: 0 auto;">
+  <div class="card-header">
+    <h2 class="card-title">Issue Request Form</h2>
+    <span class="badge badge-approved">
+      <span id="maxAvailable"><%= asset.availableQuantity %></span> Available in Lab
+    </span>
+  </div>
+  <div class="card-body">
+    <form action="/requester/request" method="POST">
+      <input type="hidden" name="assetId" value="<%= asset._id %>" />
+
+      <div class="form-group">
+        <label for="quantity">Quantity to Request *</label>
+        <input 
+          type="number" 
+          id="quantity" 
+          name="quantity" 
+          class="form-control" 
+          min="1" 
+          max="<%= asset.availableQuantity %>" 
+          value="1" 
+          required 
+          autofocus
+        />
+        <p class="form-help">Must be between 1 and <%= asset.availableQuantity %> units</p>
+      </div>
+
+      <div class="form-group">
+        <label for="purpose">Purpose of Borrowing *</label>
+        <textarea 
+          id="purpose" 
+          name="purpose" 
+          class="form-control" 
+          rows="3" 
+          placeholder="e.g. For Microcontroller Lab Experiment 4 and final project demonstration" 
+          required
+        ></textarea>
+        <p class="form-help">Specify academic project, lab session, or coursework need</p>
+      </div>
+
+      <div class="form-group">
+        <label for="expectedReturnDate">Expected Return Date *</label>
+        <input 
+          type="date" 
+          id="expectedReturnDate" 
+          name="expectedReturnDate" 
+          class="form-control" 
+          required 
+        />
+        <p class="form-help">Must be today or a future date</p>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; gap: 12px;">
+        <button type="submit" class="btn btn-primary">Submit Borrow Request</button>
+        <a href="/requester/equipment" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

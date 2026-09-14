@@ -1,0 +1,101 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Requester Dashboard</h1>
+    <p class="page-subtitle">Track your equipment requests, active checkouts, and lab returns</p>
+  </div>
+  <a href="/requester/equipment" class="btn btn-primary">Browse Available Equipment &rarr;</a>
+</div>
+
+<!-- Personal Request Metrics -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">Total Requests Placed</span>
+    <span class="stat-value"><%= stats.totalRequests %></span>
+    <span class="stat-desc">Lifetime requests submitted</span>
+  </div>
+
+  <div class="stat-card">
+    <span class="stat-label">Pending Approval</span>
+    <span class="stat-value" style="color: var(--warning);"><%= stats.pendingCount %></span>
+    <span class="stat-desc">Awaiting Lab In-charge review</span>
+  </div>
+
+  <div class="stat-card issued">
+    <span class="stat-label">Currently Issued</span>
+    <span class="stat-value" style="color: var(--accent);"><%= stats.issuedCount %></span>
+    <span class="stat-desc">In your physical possession</span>
+  </div>
+
+  <div class="stat-card available">
+    <span class="stat-label">Successfully Returned</span>
+    <span class="stat-value" style="color: var(--success);"><%= stats.returnedCount %></span>
+    <span class="stat-desc">Returned to lab</span>
+  </div>
+
+  <% if (stats.overdueCount > 0) { %>
+    <div class="stat-card overdue">
+      <span class="stat-label">Overdue Equipment</span>
+      <span class="stat-value" style="color: var(--danger);"><%= stats.overdueCount %></span>
+      <span class="stat-desc">Please return immediately!</span>
+    </div>
+  <% } %>
+</div>
+
+<!-- Recent Personal Requests -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">My Recent Requests</h2>
+    <a href="/requester/requests" class="btn btn-secondary btn-sm">View All My Requests</a>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Asset</th>
+          <th>Tag</th>
+          <th>Quantity</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th>Condition on Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentRequests && recentRequests.length > 0) { %>
+          <% recentRequests.forEach(r => { %>
+            <tr class="<%= r.isOverdue ? 'row-overdue' : '' %>">
+              <td><strong><%= r.asset ? r.asset.name : 'Unknown Equipment' %></strong></td>
+              <td><code><%= r.asset ? r.asset.assetTag : 'N/A' %></code></td>
+              <td><%= r.quantity %></td>
+              <td>
+                <%= new Date(r.expectedReturnDate).toLocaleDateString() %>
+                <% if (r.isOverdue) { %>
+                  <span class="badge badge-overdue" style="margin-left: 4px;">OVERDUE</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge badge-<%= r.status.toLowerCase() %>"><%= r.status %></span>
+              </td>
+              <td>
+                <% if (r.returnCondition) { %>
+                  <span class="badge badge-condition-<%= r.returnCondition.toLowerCase() %>"><%= r.returnCondition %></span>
+                <% } else { %>
+                  <span style="color: var(--text-muted);">&mdash;</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+              You haven't requested any equipment yet. <a href="/requester/equipment">Browse available equipment</a> to get started!
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

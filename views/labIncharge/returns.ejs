@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Active Equipment Checkouts & Returns</h1>
+    <p class="page-subtitle">Record returned equipment and inspect return condition (OK, Damaged, or Lost)</p>
+  </div>
+  <a href="/lab-incharge/requests" class="btn btn-secondary">&larr; Back to Requests Queue</a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Asset</th>
+          <th>Tag</th>
+          <th>Borrower</th>
+          <th>Qty</th>
+          <th>Issued Date</th>
+          <th>Expected Return</th>
+          <th>Status</th>
+          <th style="min-width: 280px;">Record Return & Condition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (issuedRequests && issuedRequests.length > 0) { %>
+          <% issuedRequests.forEach(r => { %>
+            <tr class="<%= r.isOverdue ? 'row-overdue' : '' %>">
+              <td><strong><%= r.asset ? r.asset.name : 'Unknown Asset' %></strong></td>
+              <td><code><%= r.asset ? r.asset.assetTag : 'N/A' %></code></td>
+              <td>
+                <strong><%= r.requester ? r.requester.name : 'Unknown' %></strong>
+                <div class="form-help"><%= r.requester ? r.requester.email : '' %></div>
+              </td>
+              <td><strong><%= r.quantity %></strong></td>
+              <td><%= r.issuedAt ? new Date(r.issuedAt).toLocaleDateString() : 'N/A' %></td>
+              <td>
+                <strong><%= new Date(r.expectedReturnDate).toLocaleDateString() %></strong>
+                <% if (r.isOverdue) { %>
+                  <span class="badge badge-overdue" style="display:block; width:fit-content; margin-top:4px;">OVERDUE</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge badge-issued">Issued</span>
+              </td>
+              <td>
+                <form action="/lab-incharge/request/<%= r._id %>/return" method="POST" style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <select name="returnCondition" class="form-control" style="padding: 6px 8px; font-size: 0.85rem;" required>
+                      <option value="OK" selected>OK (Usable)</option>
+                      <option value="Damaged">Damaged (Unusable)</option>
+                      <option value="Lost">Lost (Missing)</option>
+                    </select>
+                    <button type="submit" class="btn btn-success btn-sm" style="white-space:nowrap;">
+                      &#10003; Return
+                    </button>
+                  </div>
+                  <input 
+                    type="text" 
+                    name="remarks" 
+                    class="form-control" 
+                    placeholder="Inspection remarks (optional)" 
+                    style="padding: 4px 8px; font-size: 0.8rem;" 
+                  />
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">
+              There are currently no active issued items awaiting return.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

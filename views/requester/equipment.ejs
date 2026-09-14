@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Available Lab Equipment</h1>
+    <p class="page-subtitle">Browse instruments and hardware currently in stock and ready to be issued</p>
+  </div>
+  <a href="/requester/requests" class="btn btn-secondary">View My Requests</a>
+</div>
+
+<% if (assets && assets.length > 0) { %>
+  <div class="equipment-grid">
+    <% assets.forEach(asset => { %>
+      <div class="equipment-card">
+        <div>
+          <div class="equipment-header">
+            <h3 class="equipment-title"><%= asset.name %></h3>
+            <span class="equipment-tag"><%= asset.assetTag %></span>
+          </div>
+
+          <div class="equipment-meta">
+            <div><strong>Category:</strong> <%= asset.category %></div>
+            <div><strong>Location:</strong> <%= asset.location %></div>
+            <div>
+              <strong>Condition:</strong> 
+              <span class="badge badge-condition-<%= asset.condition.toLowerCase() %>"><%= asset.condition %></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="equipment-availability">
+            &#9679; <%= asset.availableQuantity %> of <%= asset.quantity %> units available
+          </div>
+          <a href="/requester/request/<%= asset._id %>" class="btn btn-primary" style="width: 100%;">
+            Request This Item
+          </a>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="card" style="text-align: center; padding: 48px 20px;">
+    <h3 style="color: var(--text-muted); margin-bottom: 8px;">No Equipment Currently Available</h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">All lab instruments are currently checked out. Please check back later once returns are recorded.</p>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

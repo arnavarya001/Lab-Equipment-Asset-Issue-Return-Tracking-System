@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Lab Equipment System' %> | College Lab Tracker</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand">
+        <span>LabTrack</span>
+        <span class="brand-badge">PS 8</span>
+      </a>
+
+      <ul class="nav-links">
+        <% if (currentUser) { %>
+          <% if (currentUser.role === 'admin') { %>
+            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="/admin/assets">All Assets</a></li>
+            <li><a href="/admin/assets/add">+ Add Asset</a></li>
+          <% } else if (currentUser.role === 'lab-incharge') { %>
+            <li><a href="/lab-incharge/dashboard">Dashboard</a></li>
+            <li><a href="/lab-incharge/requests">Requests Queue</a></li>
+            <li><a href="/lab-incharge/returns">Active Returns</a></li>
+          <% } else if (currentUser.role === 'requester') { %>
+            <li><a href="/requester/dashboard">Dashboard</a></li>
+            <li><a href="/requester/equipment">Browse Equipment</a></li>
+            <li><a href="/requester/requests">My Requests</a></li>
+          <% } %>
+
+          <li class="user-badge">
+            <span><%= currentUser.name %></span>
+            <span class="role-pill <%= currentUser.role %>"><%= currentUser.role %></span>
+          </li>
+          <li><a href="/logout" class="btn-logout">Logout</a></li>
+        <% } else { %>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/register">Register</a></li>
+        <% } %>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="container">
+      <div class="alerts-container">
+        <%- include('messages') %>
+      </div>

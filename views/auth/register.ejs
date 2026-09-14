@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Create an Account</h2>
+      <p>Register to manage or request institutional equipment</p>
+    </div>
+
+    <form action="/register" method="POST">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          class="form-control" 
+          placeholder="e.g. John Doe" 
+          required 
+          autofocus
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Institutional Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          placeholder="e.g. student@college.edu" 
+          required 
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          placeholder="Choose a strong password" 
+          minlength="6"
+          required 
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Assign Role</label>
+        <select id="role" name="role" class="form-control" required>
+          <option value="requester" selected>Requester (Student / Staff)</option>
+          <option value="lab-incharge">Lab In-charge</option>
+          <option value="admin">System Administrator</option>
+        </select>
+        <p class="form-help">Select the role to test appropriate dashboard features</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+        Complete Registration
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a href="/login">Sign in here</a></p>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

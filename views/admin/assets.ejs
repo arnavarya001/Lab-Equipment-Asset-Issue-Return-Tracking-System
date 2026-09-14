@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Institutional Equipment & Assets</h1>
+    <p class="page-subtitle">Complete registry of lab hardware, equipment, and stock availability</p>
+  </div>
+  <a href="/admin/assets/add" class="btn btn-primary">+ Add New Asset</a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Asset Tag</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Lab / Location</th>
+          <th>Condition</th>
+          <th>Total Qty</th>
+          <th>Available</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (assets && assets.length > 0) { %>
+          <% assets.forEach(asset => { %>
+            <tr>
+              <td><code><strong><%= asset.assetTag %></strong></code></td>
+              <td><strong><%= asset.name %></strong></td>
+              <td><%= asset.category %></td>
+              <td><%= asset.location %></td>
+              <td>
+                <span class="badge badge-condition-<%= asset.condition.toLowerCase() %>">
+                  <%= asset.condition %>
+                </span>
+              </td>
+              <td><strong><%= asset.quantity %></strong></td>
+              <td>
+                <strong style="color: <%= asset.availableQuantity > 0 ? 'var(--success)' : 'var(--danger)' %>;">
+                  <%= asset.availableQuantity %>
+                </strong>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a href="/admin/assets/edit/<%= asset._id %>" class="btn btn-secondary btn-sm">Edit</a>
+                  <form action="/admin/assets/delete/<%= asset._id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this asset?');" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              No equipment found in the database. Click "+ Add New Asset" to create the first entry.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,11 @@
+<% if (messages && messages.success && messages.success.length > 0) { %>
+  <div class="alert alert-success">
+    <span><%= messages.success %></span>
+  </div>
+<% } %>
+
+<% if (messages && messages.error && messages.error.length > 0) { %>
+  <div class="alert alert-error">
+    <span><%= messages.error %></span>
+  </div>
+<% } %>

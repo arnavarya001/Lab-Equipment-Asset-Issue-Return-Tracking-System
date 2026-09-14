@@ -1,0 +1,140 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Lab In-charge Dashboard</h1>
+    <p class="page-subtitle">Process incoming equipment requests, manage active issues, and log equipment returns</p>
+  </div>
+  <div class="btn-group">
+    <a href="/lab-incharge/requests" class="btn btn-primary">Process Requests Queue</a>
+    <a href="/lab-incharge/returns" class="btn btn-secondary">Active Returns</a>
+  </div>
+</div>
+
+<!-- Queue and Operational Metrics -->
+<div class="stats-grid">
+  <div class="stat-card" style="border-left: 4px solid var(--warning);">
+    <span class="stat-label">Pending Requests</span>
+    <span class="stat-value" style="color: var(--warning);"><%= stats.pendingCount %></span>
+    <span class="stat-desc">Awaiting your approval/rejection</span>
+  </div>
+
+  <div class="stat-card" style="border-left: 4px solid var(--info);">
+    <span class="stat-label">Approved (Ready to Issue)</span>
+    <span class="stat-value" style="color: var(--info);"><%= stats.approvedCount %></span>
+    <span class="stat-desc">Ready for physical handover</span>
+  </div>
+
+  <div class="stat-card issued">
+    <span class="stat-label">Currently Issued</span>
+    <span class="stat-value" style="color: var(--accent);"><%= stats.issuedCount %></span>
+    <span class="stat-desc">With students/staff</span>
+  </div>
+
+  <div class="stat-card available">
+    <span class="stat-label">Returned Units</span>
+    <span class="stat-value" style="color: var(--success);"><%= stats.returnedCount %></span>
+    <span class="stat-desc">Completed return cycles</span>
+  </div>
+
+  <div class="stat-card overdue">
+    <span class="stat-label">Overdue Returns</span>
+    <span class="stat-value" style="color: var(--danger);"><%= stats.overdueCount %></span>
+    <span class="stat-desc">Past due date</span>
+  </div>
+</div>
+
+<!-- Overdue Returns Urgent Table -->
+<% if (overdueRequests && overdueRequests.length > 0) { %>
+  <div class="card" style="border-left: 4px solid var(--danger);">
+    <div class="card-header" style="background-color: #fef2f2;">
+      <h2 class="card-title" style="color: #991b1b;">⚠️ Overdue Equipment (<%= overdueRequests.length %>)</h2>
+      <a href="/lab-incharge/returns" class="btn btn-danger btn-sm">Process Return</a>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Tag</th>
+            <th>Requester</th>
+            <th>Quantity</th>
+            <th>Issued On</th>
+            <th>Expected Return</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% overdueRequests.forEach(r => { %>
+            <tr class="row-overdue">
+              <td><strong><%= r.asset ? r.asset.name : 'Unknown' %></strong></td>
+              <td><code><%= r.asset ? r.asset.assetTag : 'N/A' %></code></td>
+              <td><%= r.requester ? r.requester.name : 'Unknown' %> (<%= r.requester ? r.requester.email : '' %>)</td>
+              <td><%= r.quantity %></td>
+              <td><%= r.issuedAt ? new Date(r.issuedAt).toLocaleDateString() : 'N/A' %></td>
+              <td><strong style="color: var(--danger);"><%= new Date(r.expectedReturnDate).toLocaleDateString() %></strong></td>
+              <td>
+                <a href="/lab-incharge/returns" class="btn btn-secondary btn-sm">Record Return</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+
+<!-- Pending Requests Queue Preview -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Pending Requests Queue</h2>
+    <a href="/lab-incharge/requests" class="btn btn-secondary btn-sm">View Full Queue</a>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Requester</th>
+          <th>Asset</th>
+          <th>Qty</th>
+          <th>Purpose</th>
+          <th>Expected Return</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (pendingRequests && pendingRequests.length > 0) { %>
+          <% pendingRequests.forEach(r => { %>
+            <tr>
+              <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+              <td><%= r.requester ? r.requester.name : 'Unknown' %></td>
+              <td><strong><%= r.asset ? r.asset.name : 'Asset' %></strong> (<code><%= r.asset ? r.asset.assetTag : '' %></code>)</td>
+              <td><%= r.quantity %></td>
+              <td><%= r.purpose %></td>
+              <td><%= new Date(r.expectedReturnDate).toLocaleDateString() %></td>
+              <td>
+                <div class="btn-group">
+                  <form action="/lab-incharge/request/<%= r._id %>/approve" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">&#10003; Approve</button>
+                  </form>
+                  <form action="/lab-incharge/request/<%= r._id %>/reject" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">&#10007; Reject</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+              No pending requests awaiting approval right now.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

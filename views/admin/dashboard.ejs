@@ -1,0 +1,132 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Real-time institutional inventory tracking & system metrics</p>
+  </div>
+  <a href="/admin/assets/add" class="btn btn-primary">+ Add New Equipment</a>
+</div>
+
+<!-- Live MongoDB Aggregated Statistics -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">Total Asset Models</span>
+    <span class="stat-value"><%= stats.totalAssets %></span>
+    <span class="stat-desc">Distinct equipment types</span>
+  </div>
+
+  <div class="stat-card">
+    <span class="stat-label">Total Units</span>
+    <span class="stat-value"><%= stats.totalQuantity %></span>
+    <span class="stat-desc">Total institutional assets owned</span>
+  </div>
+
+  <div class="stat-card available">
+    <span class="stat-label">Available Units</span>
+    <span class="stat-value" style="color: var(--success);"><%= stats.availableQuantity %></span>
+    <span class="stat-desc">Ready on shelves for issue</span>
+  </div>
+
+  <div class="stat-card issued">
+    <span class="stat-label">Currently Issued</span>
+    <span class="stat-value" style="color: var(--accent);"><%= stats.issuedQuantity %></span>
+    <span class="stat-desc">Actively checked out</span>
+  </div>
+
+  <div class="stat-card overdue">
+    <span class="stat-label">Overdue Returns</span>
+    <span class="stat-value" style="color: var(--danger);"><%= stats.overdueCount %></span>
+    <span class="stat-desc">Past expected return date</span>
+  </div>
+
+  <div class="stat-card damaged">
+    <span class="stat-label">Damaged / Lost</span>
+    <span class="stat-value" style="color: var(--warning);"><%= stats.damagedCount %></span>
+    <span class="stat-desc">Flagged during returns/inspection</span>
+  </div>
+</div>
+
+<!-- Overdue Returns Section -->
+<% if (overdueRequests && overdueRequests.length > 0) { %>
+  <div class="card" style="border-left: 4px solid var(--danger);">
+    <div class="card-header" style="background-color: #fef2f2;">
+      <h2 class="card-title" style="color: #991b1b;">⚠️ Action Required: Overdue Returns (<%= overdueRequests.length %>)</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Tag</th>
+            <th>Requester</th>
+            <th>Qty</th>
+            <th>Issued On</th>
+            <th>Expected Return</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% overdueRequests.forEach(reqItem => { %>
+            <tr class="row-overdue">
+              <td><strong><%= reqItem.asset ? reqItem.asset.name : 'Unknown' %></strong></td>
+              <td><code><%= reqItem.asset ? reqItem.asset.assetTag : 'N/A' %></code></td>
+              <td><%= reqItem.requester ? reqItem.requester.name : 'N/A' %> (<%= reqItem.requester ? reqItem.requester.email : '' %>)</td>
+              <td><%= reqItem.quantity %></td>
+              <td><%= reqItem.issuedAt ? new Date(reqItem.issuedAt).toLocaleDateString() : 'N/A' %></td>
+              <td><strong style="color: var(--danger);"><%= new Date(reqItem.expectedReturnDate).toLocaleDateString() %></strong></td>
+              <td><span class="badge badge-overdue">OVERDUE</span></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+
+<!-- Recent Requests Activity -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Recent Equipment Requests</h2>
+    <a href="/admin/assets" class="btn btn-secondary btn-sm">View Asset Inventory</a>
+  </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Asset</th>
+          <th>Requester</th>
+          <th>Quantity</th>
+          <th>Purpose</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentRequests && recentRequests.length > 0) { %>
+          <% recentRequests.forEach(r => { %>
+            <tr>
+              <td><%= new Date(r.createdAt).toLocaleDateString() %></td>
+              <td><strong><%= r.asset ? r.asset.name : 'Asset' %></strong> (<%= r.asset ? r.asset.assetTag : '' %>)</td>
+              <td><%= r.requester ? r.requester.name : 'Unknown' %></td>
+              <td><%= r.quantity %></td>
+              <td><%= r.purpose %></td>
+              <td>
+                <span class="badge badge-<%= r.status.toLowerCase() %>"><%= r.status %></span>
+                <% if (r.isOverdue) { %>
+                  <span class="badge badge-overdue">Overdue</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted);">No requests recorded yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

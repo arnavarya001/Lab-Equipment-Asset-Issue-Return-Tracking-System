@@ -1,0 +1,178 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Edit Equipment: <%= asset.name %></h1>
+    <p class="page-subtitle">Tag: <code><%= asset.assetTag %></code></p>
+  </div>
+  <a href="/admin/assets" class="btn btn-secondary">&larr; Back to Assets</a>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 0 auto 30px;">
+  <div class="card-header">
+    <h2 class="card-title">Asset Information</h2>
+  </div>
+  <div class="card-body">
+    <form action="/admin/assets/edit/<%= asset._id %>" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="assetTag">Asset Tag (Identifier)</label>
+          <input 
+            type="text" 
+            id="assetTag" 
+            name="assetTag" 
+            class="form-control" 
+            value="<%= asset.assetTag %>" 
+            disabled 
+          />
+          <p class="form-help">Asset Tag is fixed to preserve historical references</p>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Asset Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            value="<%= asset.name %>" 
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <input 
+            type="text" 
+            id="category" 
+            name="category" 
+            class="form-control" 
+            value="<%= asset.category %>" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="location">Lab / Location *</label>
+          <input 
+            type="text" 
+            id="location" 
+            name="location" 
+            class="form-control" 
+            value="<%= asset.location %>" 
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="condition">Physical Condition</label>
+          <select id="condition" name="condition" class="form-control" required>
+            <option value="OK" <%= asset.condition === 'OK' ? 'selected' : '' %>>OK (Functional)</option>
+            <option value="Damaged" <%= asset.condition === 'Damaged' ? 'selected' : '' %>>Damaged</option>
+            <option value="Lost" <%= asset.condition === 'Lost' ? 'selected' : '' %>>Lost</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Total Owned Quantity *</label>
+          <input 
+            type="number" 
+            id="quantity" 
+            name="quantity" 
+            class="form-control" 
+            min="1" 
+            value="<%= asset.quantity %>" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="availableQuantity">Available Quantity (On Shelf) *</label>
+          <input 
+            type="number" 
+            id="availableQuantity" 
+            name="availableQuantity" 
+            class="form-control" 
+            min="0" 
+            max="<%= asset.quantity %>" 
+            value="<%= asset.availableQuantity %>" 
+            required 
+          />
+          <p class="form-help">Must satisfy: 0 &le; Available &le; Total Quantity</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; display: flex; gap: 12px;">
+        <button type="submit" class="btn btn-primary">Update Asset</button>
+        <a href="/admin/assets" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Optional Stretch Goal: Maintenance Log for Asset -->
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+  <div class="card-header">
+    <h2 class="card-title">Maintenance & Service Log (Stretch Feature)</h2>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive" style="margin-bottom: 24px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Service Date</th>
+            <th>Cost (₹)</th>
+            <th>Next Due Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (asset.maintenanceLogs && asset.maintenanceLogs.length > 0) { %>
+            <% asset.maintenanceLogs.forEach(log => { %>
+              <tr>
+                <td><%= new Date(log.serviceDate).toLocaleDateString() %></td>
+                <td>₹<%= log.cost %></td>
+                <td><%= log.nextServiceDue ? new Date(log.nextServiceDue).toLocaleDateString() : 'N/A' %></td>
+                <td><%= log.notes || 'Routine check' %></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted);">No maintenance logs recorded yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Form to Add Maintenance Entry -->
+    <h3 style="font-size: 1rem; margin-bottom: 12px;">Add Service Entry</h3>
+    <form action="/admin/assets/<%= asset._id %>/maintenance" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="serviceDate">Service Date</label>
+          <input type="date" id="serviceDate" name="serviceDate" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="cost">Cost (₹)</label>
+          <input type="number" id="cost" name="cost" class="form-control" placeholder="e.g. 1500" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="nextServiceDue">Next Service Due</label>
+          <input type="date" id="nextServiceDue" name="nextServiceDue" class="form-control" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="notes">Service Notes / Remarks</label>
+        <input type="text" id="notes" name="notes" class="form-control" placeholder="e.g. Lens cleaning and sensor calibration" />
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">+ Record Service Log</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
