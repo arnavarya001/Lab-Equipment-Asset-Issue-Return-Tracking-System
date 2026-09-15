@@ -1,37 +1,37 @@
-// Middleware to check if user is logged in
+// check if user is logged in
 function isLoggedIn(req, res, next) {
   if (req.session && req.session.user) {
     return next();
   }
-  req.flash('error', 'Please log in to access this page.');
-  return res.redirect('/login');
+  req.flash("error", "Please login first!");
+  res.redirect("/login");
 }
 
-// Middleware to restrict route to Admin only
+// check if user is admin
 function isAdmin(req, res, next) {
-  if (req.session && req.session.user && req.session.user.role === 'admin') {
+  if (req.session && req.session.user && req.session.user.role === "admin") {
     return next();
   }
-  req.flash('error', 'Access denied. Admin privileges required.');
-  return res.redirect('/login');
+  req.flash("error", "Access denied! Only admin can view this page.");
+  res.redirect("/login");
 }
 
-// Middleware to restrict route to Lab In-charge only
+// check if user is lab incharge
 function isLabIncharge(req, res, next) {
-  if (req.session && req.session.user && req.session.user.role === 'lab-incharge') {
+  if (req.session && req.session.user && req.session.user.role === "lab-incharge") {
     return next();
   }
-  req.flash('error', 'Access denied. Lab In-charge privileges required.');
-  return res.redirect('/login');
+  req.flash("error", "Access denied! Only lab in-charge can view this page.");
+  res.redirect("/login");
 }
 
-// Middleware to restrict route to Requester (Student/Staff) only
+// check if user is requester
 function isRequester(req, res, next) {
-  if (req.session && req.session.user && req.session.user.role === 'requester') {
+  if (req.session && req.session.user && req.session.user.role === "requester") {
     return next();
   }
-  req.flash('error', 'Access denied. Requester privileges required.');
-  return res.redirect('/login');
+  req.flash("error", "Access denied! Only students or staff can view this page.");
+  res.redirect("/login");
 }
 
 module.exports = {

@@ -1,14 +1,14 @@
 # 5–10 Minute Demo Video Script & Recording Guide
-## PS 8: Lab Equipment & Asset Issue-Return Tracking System
+## Lab Equipment & Asset Issue-Return Tracking System
 
-Use this timestamped walkthrough to record your 5–10 minute screen demonstration for Assignment-2.
+Use this timestamped walkthrough to record your 5–10 minute screen demonstration.
 
 ---
 
 ### ⏱️ Segment 1: Introduction (0:00 – 1:00)
 * **On Screen**: Start on the project landing / login page (`http://localhost:3000/login`).
 * **What to Say**:
-  > *"Hello everyone and respected evaluator. Today I am demonstrating my Assignment-2 project for Problem Statement 8: Lab Equipment & Asset Issue-Return Tracking System.  
+  > *"Hello everyone and respected evaluator. Today I am demonstrating my project for the Lab Equipment & Asset Issue-Return Tracking System.  
   > In college laboratories, tracking instruments like oscilloscopes, microcontrollers, and laptops on paper registers often leads to missing inventory, stock discrepancies, and untracked overdue returns.  
   > This full-stack web application is built using Node.js, Express, MongoDB Atlas, EJS for server-side rendering, and session-based authentication. It provides three distinct user roles: Requester (Students/Staff), Lab In-charge, and Administrator."*
 
@@ -79,5 +79,5 @@ Use this timestamped walkthrough to record your 5–10 minute screen demonstrati
 ### ⏱️ Segment 8: Conclusion (9:30 – 10:00)
 * **On Screen**: Show the live running application or terminal test suite (`20/20 tests passed`).
 * **What to Say**:
-  > *"In conclusion, all core requirements of Problem Statement 8 — including asset CRUD, request workflows, over-issue prevention, return condition handling, overdue tracking, and live analytics — have been fully implemented, tested, and verified.  
+  > *"In conclusion, all core requirements of the system — including asset CRUD, request workflows, over-issue prevention, return condition handling, overdue tracking, and live analytics — have been fully implemented, tested, and verified.  
   > Thank you very much for your time!"*

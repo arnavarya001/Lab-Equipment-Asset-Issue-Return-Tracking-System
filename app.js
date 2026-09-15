@@ -1,92 +1,75 @@
-// PS 8: Lab Equipment & Asset Issue-Return Tracking System
-// Entry point: app.js
-
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const flash = require('connect-flash');
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+const session = require("express-session");
+const flash = require("connect-flash");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/lab_equipment_db';
+const port = process.env.PORT || 3000;
+const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/lab_equipment_db";
 
-// 1. Connect to MongoDB Atlas / Local MongoDB
-mongoose
-  .connect(MONGO_URI)
+// connect to mongodb database
+mongoose.connect(mongoURI)
   .then(() => {
-    console.log('✅ Connected successfully to MongoDB database');
+    console.log("Database connected successfully!");
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    console.log("Database connection error:", err);
   });
 
-// 2. Configure View Engine (EJS)
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// set view engine to ejs
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-// 3. Body Parsing & Static Assets Middleware
+// middlewares for parsing body data and static files
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-// 4. Session Configuration (Stores login sessions in MongoDB)
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'lab_equipment_secret_session_key_2026',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: MONGO_URI,
-      collectionName: 'sessions',
-      ttl: 24 * 60 * 60 // 1 day session lifespan
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 24 hours
-      httpOnly: true // Mitigates XSS cookie theft
-    }
-  })
-);
+// session setup
+app.use(session({
+  secret: "mycollegesecretkey123",
+  resave: false,
+  saveUninitialized: false
+}));
 
-// 5. Connect Flash Messages Middleware
+// flash messages setup
 app.use(flash());
 
-// 6. Global Variables for EJS Views (makes user session and flash messages available in all views)
+// pass user session and flash messages to all ejs views
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.messages = {
-    success: req.flash('success'),
-    error: req.flash('error')
+    success: req.flash("success"),
+    error: req.flash("error")
   };
   next();
 });
 
-// 7. Mount Application Routes
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin');
-const requesterRoutes = require('./routes/requester');
-const labInchargeRoutes = require('./routes/labIncharge');
+// import routes
+const authRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/admin");
+const requesterRoutes = require("./routes/requester");
+const labInchargeRoutes = require("./routes/labIncharge");
 
-app.use('/', authRoutes);
-app.use('/admin', adminRoutes);
-app.use('/requester', requesterRoutes);
-app.use('/lab-incharge', labInchargeRoutes);
+// use routes
+app.use("/", authRoutes);
+app.use("/admin", adminRoutes);
+app.use("/requester", requesterRoutes);
+app.use("/lab-incharge", labInchargeRoutes);
 
-// 8. 404 Error Handler
+// 404 page handler
 app.use((req, res) => {
-  res.status(404).render('auth/login', {
-    title: '404 - Page Not Found',
-    messages: {
-      error: 'The requested page does not exist. Redirected to login.'
-    }
+  res.status(404).render("auth/login", {
+    title: "Page Not Found",
+    messages: { error: "Page not found, redirected to login." }
   });
 });
 
-// 9. Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Lab Equipment System running on http://localhost:${PORT}`);
+// start server
+app.listen(port, () => {
+  console.log(`Server is running at port ${port}`);
 });
 
 module.exports = app;

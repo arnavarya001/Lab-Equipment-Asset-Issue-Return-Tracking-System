@@ -1,51 +1,54 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// Asset Schema defines institutional lab equipment
+// asset schema for lab equipment
 const assetSchema = new mongoose.Schema({
   assetTag: {
     type: String,
-    required: [true, 'Asset Tag is required'],
-    unique: true,
-    trim: true,
-    uppercase: true
+    required: true,
+    unique: true
   },
   name: {
     type: String,
-    required: [true, 'Asset Name is required'],
-    trim: true
+    required: true
   },
   category: {
     type: String,
-    required: [true, 'Category is required'],
-    trim: true
+    required: true
   },
   location: {
     type: String,
-    required: [true, 'Lab/Location is required'],
-    trim: true
+    required: true
   },
   condition: {
     type: String,
-    enum: ['OK', 'Damaged', 'Lost'],
-    default: 'OK'
+    default: "OK"
   },
   quantity: {
     type: Number,
-    required: [true, 'Total Quantity is required'],
-    min: [1, 'Quantity must be at least 1']
+    required: true
   },
   availableQuantity: {
     type: Number,
-    required: true,
-    min: [0, 'Available quantity cannot be negative']
+    required: true
   },
-  // Optional stretch goal: Maintenance logs per asset
+  // maintenance logs stretch feature
   maintenanceLogs: [
     {
-      serviceDate: { type: Date, default: Date.now },
-      cost: { type: Number, default: 0 },
-      nextServiceDue: { type: Date },
-      notes: { type: String, default: '' }
+      serviceDate: {
+        type: Date,
+        default: Date.now
+      },
+      cost: {
+        type: Number,
+        default: 0
+      },
+      nextServiceDue: {
+        type: Date
+      },
+      notes: {
+        type: String,
+        default: ""
+      }
     }
   ],
   createdAt: {
@@ -54,4 +57,4 @@ const assetSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Asset', assetSchema);
+module.exports = mongoose.model("Asset", assetSchema);

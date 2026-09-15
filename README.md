@@ -1,8 +1,23 @@
-# Lab Equipment & Asset Issue-Return Tracking System (PS 8)
+# Institutional Asset Management — Lab Equipment & Asset Issue-Return Tracking System
 
-> **College Assignment-2 Project**  
-> **Problem Statement 8**: Institutional Asset Management — Equipment Issue & Return Tracking System  
+> **Domain**: Institutional Asset Management  
+> **Core Purpose**: Track institutional assets and equipment as they are issued to and returned by staff or students.  
+> **Users**: Requester (Student/Staff), Lab In-charge, Admin  
 > **Tech Stack**: Node.js, Express.js, MongoDB Atlas, EJS (Server-Side Rendering), Vanilla CSS
+
+---
+
+## 🎯 Specification & Feature Matrix
+
+| Feature Area | Specification Requirement | Status | Implementation Details |
+| :--- | :--- | :---: | :--- |
+| **Role-Based Auth** | Register/login (role-based) | ✅ Complete | Multi-role registration & login (`requester`, `lab-incharge`, `admin`) with bcrypt hashing and session auth |
+| **Admin Asset CRUD** | Asset CRUD (`asset tag`, `name`, `category`, `lab/location`, `condition`, `quantity`) | ✅ Complete | Full inventory management with unique serial tag, category, room location, initial condition & quantities |
+| **Requester Workflow** | Browse available equipment, raise issue request with `purpose` and `expected return date` | ✅ Complete | Real-time available catalog browsing, stock-limited request form with mandatory purpose & return deadline |
+| **Lab In-charge Queue** | Approve/reject requests, record issue and return, update condition on return (`OK`, `Damaged`, `Lost`) | ✅ Complete | Request approval queue, physical handover trigger (stock deduction), return condition grading and inventory update |
+| **Stock & Date Guards** | Prevent issuing more units than available; flag items past their return date | ✅ Complete | Server-enforced validation `quantity <= availableQuantity`; automated real-time overdue detection & badge alerts |
+| **Executive Dashboard** | Total assets, issued, available, overdue returns, damaged/lost items | ✅ Complete | Dynamic real-time MongoDB aggregations rendered into metric cards on Admin & In-charge dashboards |
+| **Stretch Goal** | Maintenance log per asset with `service date`, `cost`, and `next service due` | ✅ Complete | Embedded maintenance logs on Asset model with history viewer & service log entry form |
 
 ---
 
@@ -16,6 +31,7 @@ This web application provides a computerized **Issue-Return Tracking System** th
 3. **Formal Handover & Return Lifecycle**: The **Lab In-charge** approves requests, formally issues items (which decrements available stock), and logs returns while inspecting return condition (`OK`, `Damaged`, or `Lost`).
 4. **Automated Overdue Tracking**: The system dynamically flags active borrowings that have passed their expected return date.
 5. **Real-Time Analytics**: An interactive dashboard displays live database metrics (Total Assets, Units Owned, Available Units, Currently Issued, Overdue Checkouts, Damaged/Lost Items).
+6. **Maintenance & Service Logging (Stretch Goal)**: Records maintenance events, costs, and scheduled calibration dates.
 
 ---
 

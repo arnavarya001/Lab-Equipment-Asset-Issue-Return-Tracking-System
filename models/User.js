@@ -1,27 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// User Schema defines the structure of user documents in MongoDB
+// user schema for students, lab incharge, and admin
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
-    trim: true
+    required: true
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
-    required: [true, 'Password is required']
+    required: true
   },
   role: {
     type: String,
-    enum: ['requester', 'lab-incharge', 'admin'],
-    default: 'requester'
+    default: "requester"
   },
   createdAt: {
     type: Date,
@@ -29,4 +25,4 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

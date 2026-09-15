@@ -1,35 +1,32 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// Request Schema tracks the full issue-return lifecycle for equipment
+// request schema to track issue and return of equipment
 const requestSchema = new mongoose.Schema({
   requester: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true
   },
   asset: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Asset',
+    ref: "Asset",
     required: true
   },
   quantity: {
     type: Number,
-    required: [true, 'Requested quantity is required'],
-    min: [1, 'Quantity must be at least 1']
+    required: true
   },
   purpose: {
     type: String,
-    required: [true, 'Purpose is required'],
-    trim: true
+    required: true
   },
   expectedReturnDate: {
     type: Date,
-    required: [true, 'Expected return date is required']
+    required: true
   },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'Rejected', 'Issued', 'Returned'],
-    default: 'Pending'
+    default: "Pending"
   },
   issuedAt: {
     type: Date
@@ -38,12 +35,11 @@ const requestSchema = new mongoose.Schema({
     type: Date
   },
   returnCondition: {
-    type: String,
-    enum: ['OK', 'Damaged', 'Lost']
+    type: String
   },
   remarks: {
     type: String,
-    default: ''
+    default: ""
   },
   createdAt: {
     type: Date,
@@ -51,16 +47,15 @@ const requestSchema = new mongoose.Schema({
   }
 });
 
-// Virtual field to dynamically check if the issued equipment is overdue
-requestSchema.virtual('isOverdue').get(function () {
-  if (this.status === 'Issued' && this.expectedReturnDate) {
+// virtual field to check if equipment is overdue
+requestSchema.virtual("isOverdue").get(function () {
+  if (this.status === "Issued" && this.expectedReturnDate) {
     return new Date() > new Date(this.expectedReturnDate);
   }
   return false;
 });
 
-// Configure schema to include virtuals when converting documents to JSON or Objects
-requestSchema.set('toObject', { virtuals: true });
-requestSchema.set('toJSON', { virtuals: true });
+requestSchema.set("toObject", { virtuals: true });
+requestSchema.set("toJSON", { virtuals: true });
 
-module.exports = mongoose.model('Request', requestSchema);
+module.exports = mongoose.model("Request", requestSchema);

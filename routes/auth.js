@@ -1,48 +1,50 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 
-// Landing / Root Route: Redirects based on authentication state
-router.get('/', (req, res) => {
+// home route redirects based on role
+router.get("/", (req, res) => {
   if (req.session && req.session.user) {
-    if (req.session.user.role === 'admin') return res.redirect('/admin/dashboard');
-    if (req.session.user.role === 'lab-incharge') return res.redirect('/lab-incharge/dashboard');
-    return res.redirect('/requester/dashboard');
+    if (req.session.user.role === "admin") {
+      return res.redirect("/admin/dashboard");
+    }
+    if (req.session.user.role === "lab-incharge") {
+      return res.redirect("/lab-incharge/dashboard");
+    }
+    return res.redirect("/requester/dashboard");
   }
-  res.redirect('/login');
+  res.redirect("/login");
 });
 
-// GET /register: Render registration form
-router.get('/register', (req, res) => {
+// show register page
+router.get("/register", (req, res) => {
   if (req.session && req.session.user) {
-    return res.redirect('/');
+    return res.redirect("/");
   }
-  res.render('auth/register', { title: 'Register - Lab Equipment System' });
+  res.render("auth/register", { title: "Register" });
 });
 
-// POST /register: Create new user account
-router.post('/register', async (req, res) => {
+// handle register
+router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Validation
     if (!name || !email || !password || !role) {
-      req.flash('error', 'All fields are required.');
-      return res.redirect('/register');
+      req.flash("error", "Please fill all fields!");
+      return res.redirect("/register");
     }
 
-    // Check if user already exists
+    // check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
     if (existingUser) {
-      req.flash('error', 'An account with this email already exists.');
-      return res.redirect('/register');
+      req.flash("error", "Email is already registered!");
+      return res.redirect("/register");
     }
 
-    // Hash password with salt rounds = 10
+    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const newUser = new User({
       name: name.trim(),
       email: email.toLowerCase().trim(),
@@ -51,47 +53,47 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    req.flash('success', 'Registration successful! You can now log in.');
-    res.redirect('/login');
+    req.flash("success", "Registration successful! Please login.");
+    res.redirect("/login");
   } catch (err) {
-    console.error('Registration Error:', err);
-    req.flash('error', 'An error occurred during registration. Please try again.');
-    res.redirect('/register');
+    console.log("Error in register:", err);
+    req.flash("error", "Something went wrong during registration.");
+    res.redirect("/register");
   }
 });
 
-// GET /login: Render login form
-router.get('/login', (req, res) => {
+// show login page
+router.get("/login", (req, res) => {
   if (req.session && req.session.user) {
-    return res.redirect('/');
+    return res.redirect("/");
   }
-  res.render('auth/login', { title: 'Login - Lab Equipment System' });
+  res.render("auth/login", { title: "Login" });
 });
 
-// POST /login: Authenticate user & start session
-router.post('/login', async (req, res) => {
+// handle login
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      req.flash('error', 'Please provide both email and password.');
-      return res.redirect('/login');
+      req.flash("error", "Please enter both email and password!");
+      return res.redirect("/login");
     }
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      req.flash('error', 'Invalid email or password.');
-      return res.redirect('/login');
+      req.flash("error", "Invalid email or password!");
+      return res.redirect("/login");
     }
 
-    // Verify password hash
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      req.flash('error', 'Invalid email or password.');
-      return res.redirect('/login');
+    // check password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      req.flash("error", "Invalid email or password!");
+      return res.redirect("/login");
     }
 
-    // Store user session (exclude password)
+    // save user in session
     req.session.user = {
       id: user._id,
       name: user.name,
@@ -99,30 +101,26 @@ router.post('/login', async (req, res) => {
       role: user.role
     };
 
-    req.flash('success', `Welcome back, ${user.name}!`);
+    req.flash("success", "Login successful!");
 
-    // Redirect based on role
-    if (user.role === 'admin') {
-      return res.redirect('/admin/dashboard');
-    } else if (user.role === 'lab-incharge') {
-      return res.redirect('/lab-incharge/dashboard');
+    if (user.role === "admin") {
+      res.redirect("/admin/dashboard");
+    } else if (user.role === "lab-incharge") {
+      res.redirect("/lab-incharge/dashboard");
     } else {
-      return res.redirect('/requester/dashboard');
+      res.redirect("/requester/dashboard");
     }
   } catch (err) {
-    console.error('Login Error:', err);
-    req.flash('error', 'An error occurred during login. Please try again.');
-    res.redirect('/login');
+    console.log("Error in login:", err);
+    req.flash("error", "Something went wrong during login.");
+    res.redirect("/login");
   }
 });
 
-// GET /logout: Destroy session & logout
-router.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-    }
-    res.redirect('/login');
+// logout user
+router.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
   });
 });
 
