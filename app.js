@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 require("dotenv").config();
 
@@ -27,11 +28,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// session setup
+// session setup with mongodb store so sessions persist on vercel
 app.use(session({
-  secret: "mycollegesecretkey123",
+  secret: process.env.SESSION_SECRET || "mycollegesecretkey123",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoURI
+  })
 }));
 
 // flash messages setup
@@ -67,9 +71,11 @@ app.use((req, res) => {
   });
 });
 
-// start server
-app.listen(port, () => {
-  console.log(`Server is running at port ${port}`);
-});
+// start server (runs locally, on vercel the app is exported as serverless)
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server is running at port ${port}`);
+  });
+}
 
 module.exports = app;
